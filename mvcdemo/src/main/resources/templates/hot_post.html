@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hot Posts</title>
+    <style>
+        /* 添加样式以美化页面 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+<h1>Hot Posts</h1>
+<ul id="hotPosts"></ul>
+
+<script>
+    // 使用 JavaScript 动态加载热门帖子列表
+
+    // 定义函数来获取热门帖子数据并呈现在页面上
+    function fetchHotPosts() {
+        // 发起 AJAX 请求获取热门帖子数据
+        fetch('/posts/sortedByWeight')
+            .then(response => response.json())
+            .then(posts => {
+                // 获取用于显示热门帖子列表的 ul 元素
+                const hotPostsList = document.getElementById('hotPosts');
+
+                // 清空 ul 元素中的内容
+                hotPostsList.innerHTML = '';
+
+                // 循环遍历热门帖子数据并添加到列表中
+                posts.forEach(post => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Post ID: ${post.id}, Title: ${post.title}`;
+                    hotPostsList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error fetching hot posts:', error));
+    }
+
+    // 在页面加载完成后调用 fetchHotPosts 函数来获取和显示热门帖子列表
+    document.addEventListener('DOMContentLoaded', fetchHotPosts);
+</script>
+</body>
+</html>

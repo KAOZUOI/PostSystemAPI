@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Author Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: 200px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin-right: 5px;
+        }
+
+        .author-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .author-container button {
+            margin-left: 10px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Authors</h1>
+
+<div>
+    <label for="authorname">Your Author id:</label>
+    <input type="text" id="authorname" />
+</div>
+
+<div id="authorsList">
+    <h2>All Authors</h2>
+
+</div>
+
+<div id="followingAuthorsList">
+    <h2>Following Authors</h2>
+</div>
+
+<script>
+    function getAllAuthors() {
+        $.ajax({
+            url: "/authors/allAuthors",
+            type: "GET",
+            success: function(data) {
+                var authorsList = $("#authorsList");
+                authorsList.empty();
+
+                data.forEach(function(author) {
+                    var authorContainer = $("<div>").addClass("author-container");
+                    var id = $("<p>").text("Author ID: " + author.id);
+                    var authorname = $("<p>").text("Author Name: " + author.authorname);
+                    var followButton = $("<button>").text("Follow");
+
+                    followButton.click(function() {
+                        followAuthor(author.authorname);
+                    });
+
+                    authorContainer.append(id);
+                    authorContainer.append(authorname);
+                    authorContainer.append(followButton);
+                    authorsList.append(authorContainer);
+                });
+            },
+            error: function() {
+                alert("Failed to fetch authors.");
+            }
+        });
+    }
+
+    function followAuthor(id) {
+        var followerId = $("#authorname").val();
+
+        $.ajax({
+            url: "/author/" + followerId + "/followAuthor",
+            type: "POST",
+            data: JSON.stringify(id),
+            contentType: "application/json",
+            success: function() {
+                alert("Author followed.");
+                showFollowingAuthors();
+            },
+            error: function() {
+                alert("Failed to follow author.");
+            }
+        });
+    }
+    function showFollowingAuthors() {
+        var authorId = $("#authorname").val();
+
+        $.ajax({
+            url: "/author/" + authorId + "/getFollowingList",
+            type: "GET",
+            success: function(data) {
+                var followingAuthorsList = $("#followingAuthorsList");
+                followingAuthorsList.empty();
+
+                data.forEach(function(following) {
+                    var followingAuthorContainer = $("<div>").addClass("author-container");
+                    var id = $("<p>").text("Author ID: " + following.following.id);
+                    var authorname = $("<p>").text("Author Name: " + following.following.authorname);
+                    var unfollowButton = $("<button>").text("Unfollow");
+
+                    unfollowButton.click(function() {
+                        unfollowAuthor(following.following.authorname);
+                    });
+
+                    followingAuthorContainer.append(id);
+                    followingAuthorContainer.append(authorname);
+                    followingAuthorContainer.append(unfollowButton);
+                    followingAuthorsList.append(followingAuthorContainer);
+                });
+            },
+            error: function() {
+                alert("Fetching following authors.");
+            }
+        });
+    }
+
+    function unfollowAuthor(id) {
+        var followerId = $("#authorname").val();
+
+        $.ajax({
+            url: "/author/" + followerId + "/unfollowAuthor",
+            type: "POST",
+            data: JSON.stringify(id),
+            contentType: "application/json",
+            success: function() {
+                alert("Author unfollowed.");
+                showFollowingAuthors();
+            },
+            error: function() {
+                alert("Failed to follow author.");
+            }
+        });
+    }
+
+
+    // Call the showFollowingAuthors function initially
+    showFollowingAuthors();
+
+    // Fetch all authors initially
+    getAllAuthors();
+</script>
+</body>
+</html>

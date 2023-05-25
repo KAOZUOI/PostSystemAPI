@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Post Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+
+        button[type="submit"] {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        #postList {
+            list-style: none;
+            padding: 0;
+        }
+
+        #postList li {
+            margin-bottom: 10px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#searchForm").submit(function (event) {
+                event.preventDefault();
+                var category = $("#categoryName").val();
+                searchPosts(category);
+            });
+
+            function searchPosts(category) {
+                $.ajax({
+                    type: "GET",
+                    url: "/posts/category/" + category,
+                    success: function (data) {
+                        if (data !== null) {
+                            displayPosts(data);
+                        } else {
+                            displayMessage("No posts found for the specified category.");
+                        }
+                    },
+                    error: function () {
+                        displayMessage("An error occurred while processing your request.");
+                    }
+                });
+            }
+
+            function displayPosts(posts) {
+                $("#postList").empty();
+                posts.forEach(function (post) {
+                    $("#postList").append("<li>" + post.title + "<br>" + post.content + "</li>");
+
+                });
+            }
+
+            function displayMessage(message) {
+                $("#postList").html("<li>" + message + "</li>");
+            }
+
+            $("#searchByCityForm").submit(function (event) {
+                event.preventDefault();
+                var city = $("#cityName").val();
+                searchPostsByCity(city);
+            });
+
+            $("#searchByCountryForm").submit(function (event) {
+                event.preventDefault();
+                var country = $("#countryName").val();
+                searchPostsByCountry(country);
+            });
+
+            $("#searchByCountryAndCityForm").submit(function (event) {
+                event.preventDefault();
+                var country = $("#countryName").val();
+                var city = $("#cityName").val();
+                searchPostsByCountryAndCity(country, city);
+            });
+
+            function searchPostsByCity(city) {
+                $.ajax({
+                    type: "GET",
+                    url: "/posts/city/" + city,
+                    success: function (data) {
+                        if (data !== null) {
+                            displayPosts(data);
+                        } else {
+                            displayMessage("No posts found for the specified city.");
+                        }
+                    },
+                    error: function () {
+                        displayMessage("An error occurred while processing your request.");
+                    }
+                });
+            }
+
+            function searchPostsByCountry(country) {
+                $.ajax({
+                    type: "GET",
+                    url: "/posts/country/" + country,
+                    success: function (data) {
+                        if (data !== null) {
+                            displayPosts(data);
+                        } else {
+                            displayMessage("No posts found for the specified country.");
+                        }
+                    },
+                    error: function () {
+                        displayMessage("An error occurred while processing your request.");
+                    }
+                });
+            }
+
+            function searchPostsByCountryAndCity(country, city) {
+                $.ajax({
+                    type: "GET",
+                    url: "/posts/country/" + country + "/city/" + city,
+                    success: function (data) {
+                        if (data !== null) {
+                            displayPosts(data);
+                        } else {
+                            displayMessage("No posts found for the specified country and city.");
+                        }
+                    },
+                    error: function () {
+                        displayMessage("An error occurred while processing your request.");
+                    }
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+<h1>Post Search</h1>
+<form id="searchForm">
+    <label for="categoryName">Category Name:</label>
+    <input type="text" id="categoryName" name="categoryName" required>
+    <button type="submit">Search</button>
+</form>
+
+<form id="searchByCityForm">
+    <label for="cityName">City Name:</label>
+    <input type="text" id="cityName" name="cityName" required>
+    <button type="submit">Search</button>
+</form>
+
+
+<form id="searchByCountryForm">
+    <label for="countryName">Country Name:</label>
+    <input type="text" id="countryName" name="countryName" required>
+    <button type="submit">Search</button>
+</form>
+
+
+<form id="searchByCountryAndCityForm">
+    <label for="countryName">Country Name:</label>
+    <input type="text" id="countryName" name="countryName" required>
+    <label for="cityName">City Name:</label>
+    <input type="text" id="cityName" name="cityName" required>
+    <button type="submit">Search</button>
+</form>
+
+
+<ul id="postList"></ul>
+
+</body>
+</html>

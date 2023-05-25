@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>显示回复过的帖子</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>显示回复过的帖子</h1>
+<label for="authorName">作者名称：</label>
+<input type="text" id="authorName" />
+<button onclick="getRepliedPosts()">显示帖子</button>
+
+<div id="repliedPosts"></div>
+
+<script>
+  function getRepliedPosts() {
+    var authorName = $("#authorName").val();
+    if (authorName.trim() === "") {
+      alert("请输入作者名称");
+      return;
+    }
+
+    $.ajax({
+      url: "/reply/repliedPosts?authorName=" + encodeURIComponent(authorName),
+      type: "GET",
+      dataType: "json",
+      success: function(response) {
+        displayRepliedPosts(response);
+      },
+      error: function(xhr, status, error) {
+        console.log("请求失败：" + error);
+      }
+    });
+  }
+
+  function displayRepliedPosts(posts) {
+    var repliedPostsDiv = $("#repliedPosts");
+    repliedPostsDiv.empty();
+
+    if (posts.length === 0) {
+      repliedPostsDiv.append("<p>没有找到回复过的帖子。</p>");
+      return;
+    }
+
+    var list = $("<ul></ul>");
+    for (var i = 0; i < posts.length; i++) {
+      var post = posts[i];
+      if (post && post.title && post.content) {
+
+        var listItem = $("<li></li>").text(post.title);
+        //content
+        var content = $("<p></p>").text(post.content);
+        listItem.append("<br/>");
+        listItem.append(content);
+        listItem.append("<br/>");
+        list.append(listItem);
+
+      }
+    }
+
+    repliedPostsDiv.append(list);
+  }
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Posts Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"] {
+      width: 200px;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 5px 10px;
+      margin-right: 5px;
+    }
+
+    .post-container {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .post-container button {
+      margin-left: 10px;
+    }
+
+    .post-item {
+      margin-bottom: 10px;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Posts</h1>
+
+<div>
+  <label for="authorName">Author Name:</label>
+  <input type="text" id="authorName" />
+  <button onclick="likePost()">Like</button>
+  <button onclick="favoritePost()">Favorite</button>
+  <button onclick="sharePost()">Share</button>
+  <button onclick="showLikedPosts()">Show Liked Posts</button>
+  <button onclick="showFavoritePosts()">Show Favorite Posts</button>
+  <button onclick="showSharedPosts()">Show Shared Posts</button>
+</div>
+
+<div id="postsList">
+  <h2>All Posts</h2>
+
+</div>
+
+<hr>
+  LikedPostsList
+<hr>
+
+
+
+
+<div id="likedPostsList">
+
+  <h2>Liked Posts</h2>
+
+
+</div>
+
+
+<hr>
+FavoritePostsList
+<hr>
+
+<div id="favoritePostsList">
+
+  <h2>Favorite Posts</h2>
+
+
+</div>
+
+<hr>
+SharedPostsList
+<hr>
+<div id="sharedPostsList">
+
+  <h2>Shared Posts</h2>
+
+
+</div>
+
+<script>
+  function getAllPosts() {
+    $.ajax({
+      url: "/posts/allPosts",
+      type: "GET",
+      success: function(data) {
+        var postsList = $("#postsList");
+        postsList.empty();
+
+        data.forEach(function(post) {
+          var postItem = $("<div>").addClass("post-item");
+          var postId = $("<p>").text("Post ID: " + post.id);
+          var postTitle = $("<p>").text("Title: " + post.title);
+          var postContent = $("<p>").text("Content: " + post.content);
+
+          var likeButton = $("<button>").text("Like");
+          likeButton.click(function() {
+            likePost(post.id);
+          });
+          postItem.append(postId);
+          postItem.append(postTitle);
+          postItem.append(postContent);
+          postItem.append(likeButton);
+
+          var favoriteButton = $("<button>").text("Favorite");
+          favoriteButton.click(function() {
+            favoritePost(post.id);
+          });
+          postItem.append(favoriteButton);
+
+          var shareButton = $("<button>").text("Share");
+          shareButton.click(function() {
+            sharePost(post.id);
+          });
+          postItem.append(shareButton);
+
+          postsList.append(postItem);
+        });
+      },
+      error: function() {
+        alert("Failed to fetch posts.");
+      }
+    });
+  }
+
+  function likePost(postId) {
+    var authorName = $("#authorName").val();
+
+    $.ajax({
+      url: "/posts/" + postId + "/like",
+      type: "POST",
+      data: JSON.stringify(authorName),
+      contentType: "application/json",
+      success: function() {
+        alert("Post liked.");
+      },
+      error: function() {
+        alert("Failed to like post.");
+      }
+    });
+  }
+
+  function favoritePost(postId) {
+    var authorName = $("#authorName").val();
+
+    $.ajax({
+      url: "/posts/" + postId + "/favorite",
+      type: "POST",
+      data: JSON.stringify(authorName),
+      contentType: "application/json",
+      success: function() {
+        alert("Post favorited.");
+      },
+      error: function() {
+        alert("Failed to favorite post.");
+      }
+    });
+  }
+
+  function sharePost(postId) {
+    var authorName = $("#authorName").val();
+
+    $.ajax({
+      url: "/posts/" + postId + "/share",
+      type: "POST",
+      data: JSON.stringify(authorName),
+      contentType: "application/json",
+      success: function() {
+        alert("Post shared.");
+      },
+      error: function() {
+        alert("Failed to share post.");
+      }
+    });
+  }
+
+  function showLikedPosts() {
+    var authorName = $("#authorName").val();
+
+    $.ajax({
+      url: "/posts/likes",
+      type: "GET",
+      data: { authorName: authorName }, // Send authorName as query parameter
+      success: function(data) {
+        var likedPostsList = $("#likedPostsList");
+        likedPostsList.empty();
+
+        data.forEach(function(post) {
+          var postItem = $("<div>").addClass("post-item");
+          var postId = $("<p>").text("Liked Post ID: " + post.id);
+          var postContent = $("<p>").text("Content: " + post.content);
+
+          postItem.append(postId);
+          postItem.append(postContent);
+          likedPostsList.append(postItem);
+        });
+      },
+      error: function() {
+        alert("Failed to fetch liked posts.");
+      }
+    });
+  }
+
+  function showFavoritePosts() {
+    var authorName = $("#authorName").val();
+
+    $.ajax({
+      url: "/posts/favorites",
+      type: "GET",
+      data: { authorName: authorName }, // Send authorName as query parameter
+      success: function(data) {
+        var favoritePostsList = $("#favoritePostsList");
+        favoritePostsList.empty();
+
+        data.forEach(function(post) {
+          var postItem = $("<div>").addClass("post-item");
+          var postId = $("<p>").text("Favorite Post ID: " + post.id);
+          var postContent = $("<p>").text("Content: " + post.content);
+
+          postItem.append(postId);
+          postItem.append(postContent);
+          favoritePostsList.append(postItem);
+        });
+      },
+      error: function() {
+        alert("Failed to fetch favorite posts.");
+      }
+    });
+  }
+
+  function showSharedPosts() {
+    var authorName = $("#authorName").val();
+
+    $.ajax({
+      url: "/posts/shares",
+      type: "GET",
+      data: { authorName: authorName }, // Send authorName as query parameter
+      success: function(data) {
+        var sharedPostsList = $("#sharedPostsList");
+        sharedPostsList.empty();
+
+        data.forEach(function(post) {
+          var postItem = $("<div>").addClass("post-item");
+          var postId = $("<p>").text("Shared Post ID: " + post.id);
+          var postContent = $("<p>").text("Content: " + post.content);
+
+          postItem.append(postId);
+          postItem.append(postContent);
+          sharedPostsList.append(postItem);
+        });
+      },
+      error: function() {
+        alert("Failed to fetch shared posts.");
+      }
+    });
+  }
+
+  // Fetch all posts initially
+  getAllPosts();
+</script>
+</body>
+</html>

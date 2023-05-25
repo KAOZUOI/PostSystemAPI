@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Author Registration</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="mb-4">Author Registration</h1>
+    <form id="authorForm">
+        <div class="form-group">
+            <label for="authorname">Author Name:</label>
+            <input type="text" class="form-control" id="authorname" name="authorname" required>
+        </div>
+        <div class="form-group">
+            <label for="registrationTime">Registration Time:</label>
+            <input type="text" class="form-control" id="registrationTime" name="registrationTime" required>
+        </div>
+        <div class="form-group">
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#authorForm').submit(function(event) {
+            event.preventDefault();
+
+            var authorData = {
+                authorname: $('#authorname').val(),
+                registrationTime: $('#registrationTime').val(),
+                phoneNumber: $('#phoneNumber').val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/authors',
+                contentType: 'application/json',
+                data: JSON.stringify(authorData),
+                success: function(response) {
+                    alert('Author registration successful');
+                    //重定向到post页面D:\IDEAproject\mvcdemo\src\main\resources\templates\post.html
+                    window.location.href = 'post';
+                },
+                error: function(xhr, status, error) {
+                    alert('Author registration failed: ' + error);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

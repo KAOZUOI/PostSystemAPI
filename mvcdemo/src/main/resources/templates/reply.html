@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reply Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"] {
+      width: 200px;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 400px;
+      height: 100px;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 5px 10px;
+      margin-right: 5px;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Reply Management</h1>
+
+<div>
+  <label for="postId">Post ID:</label>
+  <input type="text" id="postId" />
+  <label for="replyId">Reply ID:</label>
+  <input type="text" id="replyId" />
+  <label for="authorName">Author Name:</label>
+  <input type="text" id="authorName" />
+  <label for="content">Content:</label>
+  <textarea id="content"></textarea>
+  <button onclick="replyToPost()">Reply to Post</button>
+  <button onclick="replyToReply()">Reply to Reply</button>
+</div>
+
+<script>
+  function replyToPost() {
+    var postId = $("#postId").val();
+    var authorName = $("#authorName").val();
+    var content = $("#content").val();
+
+    var replyInfo = {
+      authorName: authorName,
+      content: content
+    };
+
+    $.ajax({
+      url: "/reply/" + postId + "/replyToPost",
+      type: "POST",
+      data: JSON.stringify(replyInfo),
+      contentType: "application/json",
+      success: function() {
+        alert("Replied to Post successfully.");
+        clearForm();
+      },
+      error: function() {
+        alert("Failed to reply to Post.");
+      }
+    });
+  }
+
+  function replyToReply() {
+    var replyId = $("#replyId").val();
+    var authorName = $("#authorName").val();
+    var content = $("#content").val();
+
+    var replyInfo = {
+      authorName: authorName,
+      content: content
+    };
+
+    $.ajax({
+      url: "/reply/" + replyId + "/replyToReply",
+      type: "POST",
+      data: JSON.stringify(replyInfo),
+      contentType: "application/json",
+      success: function() {
+        alert("Replied to Reply successfully.");
+        clearForm();
+      },
+      error: function() {
+        alert("Failed to reply to Reply.");
+      }
+    });
+  }
+
+  function clearForm() {
+    $("#postId").val("");
+    $("#replyId").val("");
+    $("#authorName").val("");
+    $("#content").val("");
+  }
+</script>
+</body>
+</html>
